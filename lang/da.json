@@ -1,0 +1,16 @@
+{
+    "name": "navn",
+    "km": "km",
+    "mi": "mi",
+    "km/h": "km/t",
+    "mph": "mph",
+    "not shorter than %s": "ikke kortere end %s",
+    "mileage": "kilometer",
+    "settings": "indstillinger",
+    "type": {
+        "Car": "Bil",
+        "Van": "Van",
+        "Bus": "Bus",
+        "Truck": "Lastbil"
+    }
+}

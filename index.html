@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta http-equiv="pragma" content="no-cache"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<link href="./img/favicon.png" rel="shortcut icon" type="image/x-icon" />
+
+	<link rel="stylesheet" type="text/css" href="./css/jquery-ui-timepicker-addon.css"/>
+	<link rel="stylesheet" type="text/css" href="./css/leaflet.css"/>
+	<link rel="stylesheet" type="text/css" href="./css/numbered_markers.leaflet.css"/>
+
+	<!--[if lte IE 9]><script language="javascript" type="text/javascript" src="./js/flot/excanvas.min.js"></script><![endif]-->
+
+	<script src="./js/jquery/jquery-1.8.3.min.js"></script>
+	<script src="./js/jquery/jquery-ui-1.10.3.custom.js"></script>
+	<script src="./js/jquery/jquery.cookie.js"></script>
+	<script src="./js/jquery/jquery.mousewheel.js"></script>
+	<script src="./js/jquery/jquery.localisation.js"></script>
+	<script src="./js/flot/jquery.flot.js"></script>
+	<script src="./js/flot/jquery.flot.navigate.js"></script>
+	<script src="./js/flot/jquery.flot.resize.min.js"></script>
+	<script src="./js/leaflet/leaflet.js"></script>
+	<script src="./js/leaflet/numbered_markers.leaflet.js"></script>
+	<script src="./js/underscore-min.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="//apps.wialon.com/plugins/wialon/interval/interval.wialon.css"/>
+	<link rel="stylesheet" type="text/css" href="./css/style.css"/>
+	<script src="//apps.wialon.com/plugins/leaflet/webgis/webgis.leaflet.js"></script>
+	<script src="//apps.wialon.com/plugins/wialon/interval/interval.wialon.js"></script>
+	<script src="./js/script.js"></script>
+	<script>
+		var availableLanguages=null;
+		var documentationLink="https://help.wialon.com/help/applications/en/user-guide/idrivesafe";
+		var is_white=null;
+		var APP_CONFIG = {};
+
+		function loadAppConfigSync() {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", "/idrivesafe/app/app.json", false);
+			xhr.send();
+			if (xhr.status === 200) {
+				var data = JSON.parse(xhr.responseText);
+				is_white = false;
+				document.title = decodeURIComponent(data.title || "iDriveSafe");
+				availableLanguages = data.language || null;
+			}
+
+			xhr.open("GET", "/idrivesafe/whitelabel.json", false);
+			xhr.send();
+			if (xhr.status === 200) {
+				var data = JSON.parse(xhr.responseText);
+				if (data.hasOwnProperty('IS_WHITELABEL')) {
+					is_white = data.IS_WHITELABEL === false ? false : true;
+				}
+				if (data.hasOwnProperty('alias')) {
+					document.title = decodeURIComponent(data.alias) || "iDriveSafe";
+				}
+				if (data.hasOwnProperty('help_url_link')) {
+					documentationLink = decodeURIComponent(data.help_url_link);
+				}
+				APP_CONFIG = data;
+			}
+		}
+		loadAppConfigSync();
+	</script>
+</head>
+<body>
+	<div id="container">
+		<div id="header">
+			<img class="logo" alt="" src="img/logo.svg"/>
+			<span class="app-name"></span>
+			<a class="help" target="_blank" href="/docs/en/idrivesafe.html" style="display:none;">
+				<img src="img/help.png"/>
+			</a>
+		</div>
+		<div id="header-delim"></div>
+		<div class="date-time-content">
+			<div id="dateinterval" class="interval-wialon"></div>
+			<div class="trip-length">0<div id="trip-length-limit"><div class="ui-slider-label"></div></div><span>&infin;</span></div>
+			<div id="item-info-block" style="display:none;"><span class="unit"></span><span class="settings"><img alt="" src="img/unit_0.png"/></span><div class="rate"></div></div>
+		</div>
+		<div id="stat-tab" class="tab-content">
+			<div id="items"></div>
+			<div id="drag"></div>
+			<div id="statistic">
+				<table id="all-stat">
+					<thead>
+						<tr class="header">
+							<td class="icon"></td>
+							<td class="unit"><a id="sort_1" class="sort-table" href="#"></a><img class="sort" alt="Sort" src="img/az.png"/></td>
+							<td><a id="sort_2" class="sort-table" href="#"></a><img class="sort" alt="Sort" src="img/az.png"/></td>
+							<td><a id="sort_5" class="sort-table" href="#"></a><img class="sort" alt="Sort" src="img/az.png"/></td>
+							<td><a id="sort_3" class="sort-table" href="#"></a><img class="sort" alt="Sort" src="img/az.png"/></td>
+							<td><a id="sort_4" class="sort-table" href="#"></a><img class="sort" alt="Sort" src="img/az.png"/></td>
+							<td></td>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+				<button id="add-unit-btn" style="display:none"></button>
+			</div>
+		</div>
+		<div id="item-tab" class="tab-content" style="display:none;">
+			<div class="plot-container">
+				<div id="plot-name"></div>
+				<div id="plot"></div>
+			</div>
+			<div class="viol-container">
+				<div class="viol-left">
+					<div id="no-data" style="display:none;"></div>
+					<div id="viol-header"><img id="show-all" src="img/m.png" alt=""/><span></span></div>
+					<div class="viol-table-container">
+						<table id="viol-table"></table>
+					</div>
+				</div>
+				<div class="viol-right">
+					<div id="map"></div>
+					<div id="legend"></div>
+				</div>
+			</div>
+			<div id="plot-hover" style="display:none">
+				<table>
+					<tr><td colspan="3" class="time"></td></tr>
+					<tr><td colspan="3" class="rate"></td></tr>
+					<tr class="violations">
+						<td><img src="img/a_icon.png" alt=""/><span class="a"></span></td>
+						<td><img src="img/b_icon.png" alt=""/><span class="b"></span></td>
+						<td><img src="img/t_icon.png" alt=""/><span class="t"></span></td>
+					</tr>
+					<tr><td colspan="3" class="mileage"></td></tr>
+				</table>
+			</div>
+		</div>
+		<div id="overlay-tab" class="tab-content" style="display:none;">
+			<div id="progress"></div>
+		</div>
+		<div id="footer">
+			<div class="arrow left"></div>
+			<div class="scroll">
+				<ul id="tabs"><li class="add-tab-container"><div class="add-tab">&nbsp;</div></li></ul>
+			</div>
+			<div class="arrow right"></div>
+		</div>
+		<div id="settings" style="display:none;" tabindex="100">
+			<select id="unit-type"></select>
+			<table id="rigor">
+				<tr>
+					<td id="rigor_0" style="background-image:url('img/rigor_0.png');"></td>
+					<td id="rigor_1" style="background-image:url('img/rigor_1.png');"></td>
+					<td id="rigor_2" style="background-image:url('img/rigor_2.png');"></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- TEMPLATES -->
+	<script type="text/template" id="item-template">
+		<div class="item" id="item_<%= key %>">
+			<div class="item-content">
+				<div class="item-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" style="width:16px; height:16px;"/></div>
+				<div class="item-name-block"><%= value %></div>
+				<div class="clear"></div>
+			</div>
+			<img class="arrow" src="img/arrow.png" alt="" title="<%= $.localise.tr('Add unit') %>"/>
+		</div>
+	</script>
+	<script type="text/template" id="all-stat-row">
+		<tr id="row_<%= id %>" class="item_tr">
+			<td class="icon"><img src="<%= img %>" alt="" style="width:16px; height:16px;"/></td>
+			<td class="unit"><%= name %></td>
+			<td class="rate"><img src="./img/loader.gif"/></td>
+			<td class="duration"><img src="./img/loader.gif"/></td>
+			<td class="mileage"><img src="./img/loader.gif"/></td>
+			<td class="settings"><img alt="" src="<%= settings %>"/></td>
+			<td class="delete delete-stat" title="<%= $.localise.tr('Delete statistics') %>"><img src="img/del.png" alt="delete"/></td>
+		</tr>
+	</script>
+	<script type="text/template" id="viol-row">
+		<tr id="viol_<%= id %>_<%= ind %>" class="viol-tr<% if(type){ %> <%= type %><% } %>" data-x="<%= x %>" data-y="<%= y %>" data-index="<%= index %>">
+			<td class="viol-number"><%= num %>.</td>
+			<td class="viol-time"><%= time %></td>
+			<td class="viol-icon"><img alt="" src="./img/<%= type %>_icon.png"/></td>
+			<td class="viol-text"><%= text %></td>
+		</tr>
+	</script>
+	<script type="text/template" id="item-tab-template"><li <% if(!tab_type){ %>class="stat-tab" style="border-bottom-color:<%= color %>;"<% } %>><div id="<%= id %>" class="tab <%= cls %>" title="<%= title %>" <% if(!close){ %>style="padding-right:10px;"<% } %>><% if(img){ %><img class="icon" alt="" src="<%= img %>"/><% } %><%= name %></div><% if(close){ %><div id="closetab_<%= id %>" title="<%= $.localise.tr('Close tab') %>" class="closetab">&nbsp;</div><% }%></li></script>
+</body>
+</html>

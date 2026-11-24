@@ -1,0 +1,66 @@
+{
+    "deprecated": true,
+    "name": "idrive_safe",
+    "url_name": "idrivesafe",
+    "title": "iDriveSafe",
+    "description": "iDriveSafe is a comprehensive driving quality control system that allows to evaluate drivers’ behavior and the way they treat their vehicles.",
+    "author": {
+        "name": "",
+        "url": ""
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://github.com/wialon/wialon-app-idrivesafe/blob/main/LICENSE-MIT"
+        }
+    ],
+    "dependencies": {
+        "jquery": "1.8.3"
+    },
+    "modules": [
+        "sdk"
+    ],
+    "params": [
+        "Active SID",
+        "Base URL",
+        "Host URL",
+        "Language",
+        "Current user"
+    ],
+    "docs": [],
+    "language": [
+        "en",
+        "bg",
+        "br",
+        "da",
+        "es",
+        "et",
+        "fa",
+        "fi",
+        "fr",
+        "hu",
+        "it",
+        "lv",
+        "pl",
+        "ru",
+        "sk",
+        "tr",
+        "uk"
+    ],
+    "build_date": "2026-11-20",
+    "release_date": "2013-11-01",
+    "version": "1.3.3",
+    "keywords": [
+        "wialon",
+        "wialon-apps"
+    ],
+    "browser": {
+        "ie": "9+",
+        "opera": "10+",
+        "safari": "10+",
+        "chrome": "20+",
+        "firefox": "15+"
+    },
+    "logo": "logo.png",
+    "desc_path": "desc"
+}
